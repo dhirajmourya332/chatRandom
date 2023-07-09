@@ -3,7 +3,7 @@ const redis = require("redis");
 const { v4: uuidv4 } = require("uuid");
 const WebSocketServer = require("websocket").server;
 const express = require("express");
-const os = require("node:os");
+const os = require("os");
 const cors = require("cors");
 
 const NodeInstanceInterConnection = require("../instance_interconnection");
@@ -38,7 +38,7 @@ class Server {
       app.use(cors());
 
       app.get("/healthz", (req, res) => {
-        res.json({health:"OK"});
+        res.json({ health: "OK" });
       });
 
       server.listen(PORT, function () {
