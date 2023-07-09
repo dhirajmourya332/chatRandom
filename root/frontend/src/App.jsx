@@ -299,9 +299,10 @@ function App() {
 
   function establishWebsocketWithSignallingServer() {
     const ws_url =
-      window.location.protocol === "https:"
-        ? "wss:"
-        : "ws:" + "//" + window.location.host + window.location.pathname;
+      (window.location.protocol === "https:" ? "wss:" : "ws:") +
+      "//" +
+      window.location.host +
+      window.location.pathname;
     signallingSocket.current = new WebSocket(ws_url);
     // Connection opened
     signallingSocket.current.addEventListener("open", () => {});
