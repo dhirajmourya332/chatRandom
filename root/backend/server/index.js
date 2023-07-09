@@ -37,8 +37,8 @@ class Server {
       app.use(express.static("./public"));
       app.use(cors());
 
-      app.get("/", (req, res) => {
-        res.end("hello");
+      app.get("/healthz", (req, res) => {
+        res.json({health:"OK"});
       });
 
       server.listen(PORT, function () {
