@@ -1,6 +1,6 @@
 require("dotenv").config();
 
-const os = require("node:os");
+const os = require("os");
 const zmq = require("zeromq");
 const cluster = require("cluster");
 
