@@ -24,7 +24,7 @@ function App() {
   const signallingSocket = useRef(null);
   const [_, reRenderPage] = useState(null);
   const [callSessionState, setCallSessionState] = useState("somethinf Random");
-  const [mediaPermission, setMediaPermission] = useState(false);
+  const [mediaPermission, setMediaPermission] = useState(null);
 
   // function toggleAudioMediaConstraint() {
   //   setMediaConstraint((prevMediaConstraint) => {
@@ -81,11 +81,11 @@ function App() {
   //       );
   //       rtcPeerConnectionRef.current.setLocalDescription(offer);
   //     })
-  //     .catch((error) => console.log(error));
+  //     .catch((error) => //console.log(error));
   // }
 
   // async function handleOffer(offer) {
-  //   console.log("handle offer called!");
+  //   //console.log("handle offer called!");
   //   await rtcPeerConnectionRef.current.setRemoteDescription(offer);
   //   const sdp_answer = await rtcPeerConnectionRef.current.createAnswer();
 
@@ -93,11 +93,11 @@ function App() {
   //   await rtcPeerConnectionRef.current.setLocalDescription(sdp_answer);
   // }
   // async function handleAnswer(answer) {
-  //   // console.log(answer);
+  //   // //console.log(answer);
   //   await rtcPeerConnectionRef.current.setRemoteDescription(answer);
   // }
   // async function handleIceCandidates(candidate) {
-  //   console.log("gotIce candidate");
+  //   //console.log("gotIce candidate");
   //   if (!candidate.candidate) {
   //     await rtcPeerConnectionRef.current.addIceCandidate(null);
   //   } else {
@@ -106,7 +106,7 @@ function App() {
   // }
   // // async function wsMessageHandler(message) {
   // //   const data = JSON.parse(JSON.parse(message)["utf8Data"]);
-  // //   console.log(data);
+  // //   //console.log(data);
   // //   if (data["info"] && data["info"] === "pipe_established") {
   // //     createNewRtcConnection();
   // //   }
@@ -117,7 +117,7 @@ function App() {
   // //     await handleOffer(data);
   // //   }
   // //   if (data["type"] && data["type"] === "answer") {
-  // //     console.log("got answer");
+  // //     //console.log("got answer");
   // //     await handleAnswer(data);
   // //   }
   // //   if (data["type"] && data["type"] === "candidate") {
@@ -138,7 +138,7 @@ function App() {
   // //         wsMessageHandler(event.data);
   // //       });
   // //       socket.addEventListener("close", () => {
-  // //         console.log("ws connection closed!");
+  // //         //console.log("ws connection closed!");
   // //         setTimeout(async () => {
   // //           await establishWebSocketWithSignallingServer();
   // //         }, 1000);
@@ -176,12 +176,14 @@ function App() {
       if (rtcPeerConnection.current) {
         rtcPeerConnection.current.close();
       }
+    }
+    if (signallingSocket) {
       signallingSocket.current.close();
     }
   }
 
   async function handleIceCandidates(candidate) {
-    console.log("gotIce candidate");
+    //console.log("gotIce candidate");
     if (!candidate.candidate) {
       await rtcPeerConnection.current.addIceCandidate(null);
     } else {
@@ -190,12 +192,12 @@ function App() {
   }
 
   async function handleAnswer(answer) {
-    // console.log(answer);
+    // //console.log(answer);
     await rtcPeerConnection.current.setRemoteDescription(answer);
   }
 
   async function handleOffer(offer) {
-    console.log("handle offer called!");
+    //console.log("handle offer called!");
     await rtcPeerConnection.current.setRemoteDescription(offer);
     const sdp_answer = await rtcPeerConnection.current.createAnswer();
 
@@ -206,7 +208,7 @@ function App() {
   }
 
   async function createOffer() {
-    console.log("second");
+    //console.log("second");
     rtcPeerConnection.current
       .createOffer()
       .then(async (offer) => {
@@ -239,6 +241,7 @@ function App() {
           case "disconnected":
           case "closed":
           case "failed":
+            //console.log("peer connection ended!");
             setCallSessionState("closed");
             hangUpVideoChatSession();
             break;
@@ -264,22 +267,18 @@ function App() {
       };
       if (rtcPeerConnection.current) {
         stream.getTracks().forEach(async (track) => {
-          const sender = await rtcPeerConnection.current.addTrack(
-            track,
-            stream
-          );
-          console.log(sender.getParameters());
+          await rtcPeerConnection.current.addTrack(track, stream);
         });
       }
     } catch (error) {
-      console.log(error);
+      //console.log(error);
     }
   }
 
   async function wsMessageHandler(message) {
-    console.log(message);
+    //console.log(message);
     const data = JSON.parse(JSON.parse(message)["utf8Data"]);
-    console.log(data);
+    //console.log(data);
     if (data["info"] && data["info"] === "pipe_established") {
       await createNewRtcConnection();
     }
@@ -290,7 +289,7 @@ function App() {
       await handleOffer(data);
     }
     if (data["type"] && data["type"] === "answer") {
-      console.log("got answer");
+      //console.log("got answer");
       await handleAnswer(data);
     }
     if (data["type"] && data["type"] === "candidate") {
@@ -299,7 +298,11 @@ function App() {
   }
 
   function establishWebsocketWithSignallingServer() {
-    signallingSocket.current = new WebSocket("ws://192.168.0.109:5000");
+    const ws_url =
+      window.location.protocol === "https:"
+        ? "wss:"
+        : "ws:" + "//" + window.location.host + window.location.pathname;
+    signallingSocket.current = new WebSocket(ws_url);
     // Connection opened
     signallingSocket.current.addEventListener("open", () => {});
 
@@ -308,7 +311,7 @@ function App() {
       await wsMessageHandler(event.data);
     });
     signallingSocket.current.addEventListener("close", () => {
-      console.log("ws connection closed!");
+      //console.log("ws connection closed!");
       setTimeout(() => {
         establishWebsocketWithSignallingServer();
       }, 1000);
@@ -323,6 +326,10 @@ function App() {
           setLocalVideoStream(stream);
           localVideoStreamRef.current = stream;
           setMediaPermission(true);
+        })
+        .catch((error) => {
+          //console.log("cam blocked");
+          setMediaPermission(null);
         });
     }
   }, [mediaPermission]);
@@ -332,6 +339,7 @@ function App() {
 
     //
     if (mediaPermission) {
+      //console.log("kkkkkkk--------------------");
       signallingSocket.current
         ? null
         : establishWebsocketWithSignallingServer();
@@ -352,7 +360,7 @@ function App() {
   //     setLocalVideoStream(stream);
   //     if (rtcPeerConnection.current) {
   //       stream.getTracks().forEach(async (track) => {
-  //         console.log("first");
+  //         //console.log("first");
   //         await rtcPeerConnection.current.addTrack(track, stream);
   //       });
   //     }
@@ -364,7 +372,7 @@ function App() {
   //   //     setLocalVideoStream(stream);
   //   //     if (rtcPeerConnection.current) {
   //   //       stream.getTracks().forEach(async (track) => {
-  //   //         console.log("first");
+  //   //         //console.log("first");
   //   //         await rtcPeerConnection.current.addTrack(track, stream);
   //   //       });
   //   //     }
@@ -375,7 +383,7 @@ function App() {
   //   //     );
   //   //   });
   // }, [mediaConstraint]);
-  return (
+  return mediaPermission ? (
     <>
       <div className="flex flex-col md:flex-row w-full h-screen gap-3 p-2 bg-gray-600">
         <div className="w-full h-1/2 md:w-1/2 md:h-full bg-black rounded-md overflow-hidden">
@@ -414,6 +422,39 @@ function App() {
         />
       </div>
     </>
+  ) : (
+    <div className="flex items-center justify-center w-full h-screen">
+      <div className="flex flex-col gap-5">
+        <div className="flex mx-auto w-28 h-28 md:w-32 md:h-32 lg:w-36 lg:h-36">
+          <svg
+            height="100%"
+            width="100%"
+            version="1.1"
+            id="Layer_1"
+            xmlns="http://www.w3.org/2000/svg"
+            xmlnsXlink="http://www.w3.org/1999/xlink"
+            viewBox="0 0 512 512"
+            xmlSpace="preserve"
+          >
+            <g>
+              <g>
+                <path
+                  style={{ fill: "#231F20" }}
+                  d="M388.227,0H123.774C76.606,0,38.232,38.374,38.232,85.541v215.935
+			c0,47.167,38.374,85.541,85.541,85.541h44.258l-8.727,103.571c-1.454,17.269,18.376,27.681,31.795,17.235l155.206-120.805h41.92
+			c47.167,0,85.541-38.374,85.541-85.541V85.541C473.768,38.374,435.394,0,388.227,0z M326.159,210.604l-120.578,69.615
+			c-13.122,7.578-29.61-1.911-29.61-17.095v-139.23c0-15.19,16.48-24.678,29.61-17.095l120.578,69.615
+			C339.311,184.007,339.292,203.022,326.159,210.604z"
+                />
+              </g>
+            </g>
+          </svg>
+        </div>
+        <h2 className="flex items-center justify-center font-semibold sm:text-lg md:text-xl">
+          chatRandom
+        </h2>
+      </div>
+    </div>
   );
 }
 

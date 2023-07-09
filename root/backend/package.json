@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node init.js && pm2 start index.js -i max && pm2 monit",
+    "start": "node init.js && node index.js",
     "stop": "pm2 stop index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
