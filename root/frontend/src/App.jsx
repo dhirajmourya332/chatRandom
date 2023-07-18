@@ -81,11 +81,11 @@ function App() {
   //       );
   //       rtcPeerConnectionRef.current.setLocalDescription(offer);
   //     })
-  //     .catch((error) => //console.log(error));
+  //     .catch((error) => console.log(error));
   // }
 
   // async function handleOffer(offer) {
-  //   //console.log("handle offer called!");
+  //   console.log("handle offer called!");
   //   await rtcPeerConnectionRef.current.setRemoteDescription(offer);
   //   const sdp_answer = await rtcPeerConnectionRef.current.createAnswer();
 
@@ -93,11 +93,11 @@ function App() {
   //   await rtcPeerConnectionRef.current.setLocalDescription(sdp_answer);
   // }
   // async function handleAnswer(answer) {
-  //   // //console.log(answer);
+  //   // console.log(answer);
   //   await rtcPeerConnectionRef.current.setRemoteDescription(answer);
   // }
   // async function handleIceCandidates(candidate) {
-  //   //console.log("gotIce candidate");
+  //   console.log("gotIce candidate");
   //   if (!candidate.candidate) {
   //     await rtcPeerConnectionRef.current.addIceCandidate(null);
   //   } else {
@@ -106,7 +106,7 @@ function App() {
   // }
   // // async function wsMessageHandler(message) {
   // //   const data = JSON.parse(JSON.parse(message)["utf8Data"]);
-  // //   //console.log(data);
+  // //   console.log(data);
   // //   if (data["info"] && data["info"] === "pipe_established") {
   // //     createNewRtcConnection();
   // //   }
@@ -117,7 +117,7 @@ function App() {
   // //     await handleOffer(data);
   // //   }
   // //   if (data["type"] && data["type"] === "answer") {
-  // //     //console.log("got answer");
+  // //     console.log("got answer");
   // //     await handleAnswer(data);
   // //   }
   // //   if (data["type"] && data["type"] === "candidate") {
@@ -138,7 +138,7 @@ function App() {
   // //         wsMessageHandler(event.data);
   // //       });
   // //       socket.addEventListener("close", () => {
-  // //         //console.log("ws connection closed!");
+  // //         console.log("ws connection closed!");
   // //         setTimeout(async () => {
   // //           await establishWebSocketWithSignallingServer();
   // //         }, 1000);
@@ -183,7 +183,7 @@ function App() {
   }
 
   async function handleIceCandidates(candidate) {
-    //console.log("gotIce candidate");
+    console.log("gotIce candidate");
     if (!candidate.candidate) {
       await rtcPeerConnection.current.addIceCandidate(null);
     } else {
@@ -192,12 +192,12 @@ function App() {
   }
 
   async function handleAnswer(answer) {
-    // //console.log(answer);
+    // console.log(answer);
     await rtcPeerConnection.current.setRemoteDescription(answer);
   }
 
   async function handleOffer(offer) {
-    //console.log("handle offer called!");
+    console.log("handle offer called!");
     await rtcPeerConnection.current.setRemoteDescription(offer);
     const sdp_answer = await rtcPeerConnection.current.createAnswer();
 
@@ -208,7 +208,7 @@ function App() {
   }
 
   async function createOffer() {
-    //console.log("second");
+    console.log("second");
     rtcPeerConnection.current
       .createOffer()
       .then(async (offer) => {
@@ -241,7 +241,7 @@ function App() {
           case "disconnected":
           case "closed":
           case "failed":
-            //console.log("peer connection ended!");
+            console.log("peer connection ended!");
             setCallSessionState("closed");
             hangUpVideoChatSession();
             break;
@@ -271,14 +271,14 @@ function App() {
         });
       }
     } catch (error) {
-      //console.log(error);
+      console.log(error);
     }
   }
 
   async function wsMessageHandler(message) {
-    //console.log(message);
+    console.log(message);
     const data = JSON.parse(JSON.parse(message)["utf8Data"]);
-    //console.log(data);
+    console.log(data);
     if (data["info"] && data["info"] === "pipe_established") {
       await createNewRtcConnection();
     }
@@ -289,7 +289,7 @@ function App() {
       await handleOffer(data);
     }
     if (data["type"] && data["type"] === "answer") {
-      //console.log("got answer");
+      console.log("got answer");
       await handleAnswer(data);
     }
     if (data["type"] && data["type"] === "candidate") {
@@ -301,8 +301,8 @@ function App() {
     const ws_url =
       (window.location.protocol === "https:" ? "wss:" : "ws:") +
       "//" +
-      window.location.host +
-      window.location.pathname;
+      "chat-random-back.onrender.com" +
+      "/";
     signallingSocket.current = new WebSocket(ws_url);
     // Connection opened
     signallingSocket.current.addEventListener("open", () => {});
@@ -312,7 +312,7 @@ function App() {
       await wsMessageHandler(event.data);
     });
     signallingSocket.current.addEventListener("close", () => {
-      //console.log("ws connection closed!");
+      console.log("ws connection closed!");
       setTimeout(() => {
         establishWebsocketWithSignallingServer();
       }, 1000);
@@ -329,7 +329,7 @@ function App() {
           setMediaPermission(true);
         })
         .catch((error) => {
-          //console.log("cam blocked");
+          console.log("cam blocked");
           setMediaPermission(null);
         });
     }
@@ -340,7 +340,7 @@ function App() {
 
     //
     if (mediaPermission) {
-      //console.log("kkkkkkk--------------------");
+      console.log("kkkkkkk--------------------");
       signallingSocket.current
         ? null
         : establishWebsocketWithSignallingServer();
@@ -361,7 +361,7 @@ function App() {
   //     setLocalVideoStream(stream);
   //     if (rtcPeerConnection.current) {
   //       stream.getTracks().forEach(async (track) => {
-  //         //console.log("first");
+  //         console.log("first");
   //         await rtcPeerConnection.current.addTrack(track, stream);
   //       });
   //     }
@@ -373,7 +373,7 @@ function App() {
   //   //     setLocalVideoStream(stream);
   //   //     if (rtcPeerConnection.current) {
   //   //       stream.getTracks().forEach(async (track) => {
-  //   //         //console.log("first");
+  //   //         console.log("first");
   //   //         await rtcPeerConnection.current.addTrack(track, stream);
   //   //       });
   //   //     }

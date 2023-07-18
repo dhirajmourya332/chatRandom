@@ -33,8 +33,6 @@ class Server {
       const app = express();
       const server = http.createServer(app);
 
-      //server static files
-      app.use(express.static("./public"));
       app.use(cors());
 
       app.get("/healthz", (req, res) => {
